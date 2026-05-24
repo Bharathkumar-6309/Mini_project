@@ -309,9 +309,10 @@ def runSVM(request):
             context = {'data': "Please Preprocess Dataset First"}
             return render(request, 'AdminApp/AdminHome.html', context)
 
-        model = svm.SVC(random_state=0)
+        # Lightweight SVM
+        model = svm.LinearSVC()
 
-        model.fit(X_train, y_train.values.ravel())
+        model.fit(X_train, y_train)
 
         prediction = model.predict(X_test)
 
