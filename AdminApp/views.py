@@ -132,7 +132,7 @@ def split(request):
 
         data = df.copy()
 
-        # Drop columns safely
+        # Drop unnecessary columns safely
         columns_to_drop = [
             'Operational date',
             'Intersection Type And Control'
@@ -142,8 +142,12 @@ def split(request):
             if col in data.columns:
                 data.drop(col, axis=1, inplace=True)
 
-        # Fill null values
-        data.fillna(0, inplace=True)
+        # Fill null values safely
+        data = data.fillna("Unknown")
+
+        # Convert all columns to string safely
+        for col in data.columns:
+            data[col] = data[col].astype(str)
 
         # Encode categorical data
         df1 = pd.DataFrame({
@@ -169,6 +173,7 @@ def split(request):
             if col not in df1.columns:
                 missing_columns.append(col)
 
+        # Show missing columns clearly
         if len(missing_columns) > 0:
 
             context = {
@@ -177,6 +182,42 @@ def split(request):
 
             return render(request, 'AdminApp/AdminHome.html', context)
 
+        # Features
+        X = df1[
+            [
+                'Rural/Urban',
+                'Causes',
+                'Road Feature',
+                'Road condition',
+                'Weather Condition',
+                'Vehicle Responsible'
+            ]
+        ]
+
+        # Target
+        y = df1['Type of Accident']
+
+        # Split dataset
+        X_train, X_test, y_train, y_test = train_test_split(
+            X,
+            y,
+            test_size=0.2,
+            random_state=42
+        )
+
+        context = {
+            "data": "Preprocessing Completed Successfully"
+        }
+
+        return render(request, 'AdminApp/AdminHome.html', context)
+
+    except Exception as e:
+
+        context = {
+            'data': 'Preprocessing Error : ' + str(e)
+        }
+
+        return render(request, 'AdminApp/AdminHome.html', context)
         # Features
         X = df1[
             [
