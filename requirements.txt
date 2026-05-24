@@ -1,2 +1,7 @@
-Django
+Django==2.2.7
 gunicorn
+whitenoise
+pandas
+numpy
+scikit-learn
+joblib
